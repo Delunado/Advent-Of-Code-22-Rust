@@ -2,6 +2,11 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
+enum PlayerDataManagementType {
+    AsMovement,
+    AsGuide,
+}
+
 #[derive(PartialEq, Eq, Ord)]
 enum Movement {
     //Rock, same as X
@@ -39,20 +44,45 @@ struct Strategy {
 }
 
 impl Strategy {
-    pub fn new(enemy_movement_data: &str, player_movement_data: &str) -> Strategy {
-        let player_movement = match player_movement_data {
-            "X" => Movement::A,
-            "Y" => Movement::B,
-            "Z" => Movement::C,
-            _ => Movement::A
-        };
-
+    pub fn new(enemy_movement_data: &str, player_movement_data: &str, player_data_management_type: PlayerDataManagementType) -> Strategy {
         let enemy_movement = match enemy_movement_data {
             "A" => Movement::A,
             "B" => Movement::B,
             "C" => Movement::C,
             _ => Movement::A
         };
+
+
+        let player_movement;
+
+        player_movement = match player_data_management_type {
+            PlayerDataManagementType::AsMovement => match player_movement_data {
+                "X" => Movement::A,
+                "Y" => Movement::B,
+                "Z" => Movement::C,
+                _ => Movement::A
+            },
+
+            PlayerDataManagementType::AsGuide => match player_movement_data {
+                "X" => match enemy_movement { //This means lose
+                    Movement::A => Movement::C,
+                    Movement::B => Movement::A,
+                    Movement::C => Movement::B,
+                },
+                "Y" => match enemy_movement { //This means draw
+                    Movement::A => Movement::A,
+                    Movement::B => Movement::B,
+                    Movement::C => Movement::C,
+                },
+                "Z" => match enemy_movement { //This means win
+                    Movement::A => Movement::B,
+                    Movement::B => Movement::C,
+                    Movement::C => Movement::A,
+                },
+                _ => Movement::A
+            }
+        };
+
 
         let strategy = Strategy {
             player_movement,
@@ -99,6 +129,7 @@ pub fn resolve() {
     let file_content = fs::read_to_string(path_file)
         .expect("Something went wrong reading the file");
 
+    //Part 1
     let mut score_sum = 0;
 
     for line in file_content.lines() {
@@ -108,10 +139,29 @@ pub fn resolve() {
             movements_vector.push(movement);
         }
 
-        let strategy = Strategy::new(movements_vector[0], movements_vector[1]);
+        let strategy = Strategy::new(movements_vector[0], movements_vector[1],
+                                     PlayerDataManagementType::AsMovement);
 
         score_sum += strategy.calculate_score();
     }
 
-    println!("{}", score_sum);
+    println!("Puzzle 2 Part 1: {}", score_sum);
+
+    //Part 2
+    score_sum = 0;
+
+    for line in file_content.lines() {
+        let mut movements_vector: Vec<&str> = vec!();
+
+        for movement in line.split_whitespace() {
+            movements_vector.push(movement);
+        }
+
+        let strategy = Strategy::new(movements_vector[0], movements_vector[1],
+                                     PlayerDataManagementType::AsGuide);
+
+        score_sum += strategy.calculate_score();
+    }
+
+    println!("Puzzle 2 Part 2: {}", score_sum);
 }
