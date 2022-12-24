@@ -9,31 +9,31 @@ enum PlayerDataManagementType {
 
 #[derive(PartialEq, Eq, Ord)]
 enum Movement {
-    //Rock, same as X
-    A,
+    //A, X
+    Rock,
 
-    //Paper, same as Y
-    B,
+    //B, Y
+    Paper,
 
-    //Scissor, same as Z
-    C,
+    //C, Z
+    Scissor,
 }
 
 impl PartialOrd for Movement {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {
-            (Movement::A, Movement::A) => Some(Equal),
-            (Movement::B, Movement::B) => Some(Equal),
-            (Movement::C, Movement::C) => Some(Equal),
+            (Movement::Rock, Movement::Rock) => Some(Equal),
+            (Movement::Paper, Movement::Paper) => Some(Equal),
+            (Movement::Scissor, Movement::Scissor) => Some(Equal),
 
-            (Movement::A, Movement::B) => Some(Less),
-            (Movement::A, Movement::C) => Some(Greater),
+            (Movement::Rock, Movement::Paper) => Some(Less),
+            (Movement::Rock, Movement::Scissor) => Some(Greater),
 
-            (Movement::B, Movement::A) => Some(Greater),
-            (Movement::B, Movement::C) => Some(Less),
+            (Movement::Paper, Movement::Rock) => Some(Greater),
+            (Movement::Paper, Movement::Scissor) => Some(Less),
 
-            (Movement::C, Movement::A) => Some(Less),
-            (Movement::C, Movement::B) => Some(Greater)
+            (Movement::Scissor, Movement::Rock) => Some(Less),
+            (Movement::Scissor, Movement::Paper) => Some(Greater)
         }
     }
 }
@@ -46,40 +46,37 @@ struct Strategy {
 impl Strategy {
     pub fn new(enemy_movement_data: &str, player_movement_data: &str, player_data_management_type: PlayerDataManagementType) -> Strategy {
         let enemy_movement = match enemy_movement_data {
-            "A" => Movement::A,
-            "B" => Movement::B,
-            "C" => Movement::C,
-            _ => Movement::A
+            "A" => Movement::Rock,
+            "B" => Movement::Paper,
+            "C" => Movement::Scissor,
+            _ => Movement::Rock
         };
 
-
-        let player_movement;
-
-        player_movement = match player_data_management_type {
+        let player_movement = match player_data_management_type {
             PlayerDataManagementType::AsMovement => match player_movement_data {
-                "X" => Movement::A,
-                "Y" => Movement::B,
-                "Z" => Movement::C,
-                _ => Movement::A
+                "X" => Movement::Rock,
+                "Y" => Movement::Paper,
+                "Z" => Movement::Scissor,
+                _ => Movement::Rock
             },
 
             PlayerDataManagementType::AsGuide => match player_movement_data {
                 "X" => match enemy_movement { //This means lose
-                    Movement::A => Movement::C,
-                    Movement::B => Movement::A,
-                    Movement::C => Movement::B,
+                    Movement::Rock => Movement::Scissor,
+                    Movement::Paper => Movement::Rock,
+                    Movement::Scissor => Movement::Paper,
                 },
                 "Y" => match enemy_movement { //This means draw
-                    Movement::A => Movement::A,
-                    Movement::B => Movement::B,
-                    Movement::C => Movement::C,
+                    Movement::Rock => Movement::Rock,
+                    Movement::Paper => Movement::Paper,
+                    Movement::Scissor => Movement::Scissor,
                 },
                 "Z" => match enemy_movement { //This means win
-                    Movement::A => Movement::B,
-                    Movement::B => Movement::C,
-                    Movement::C => Movement::A,
+                    Movement::Rock => Movement::Paper,
+                    Movement::Paper => Movement::Scissor,
+                    Movement::Scissor => Movement::Rock,
                 },
-                _ => Movement::A
+                _ => Movement::Rock
             }
         };
 
@@ -105,9 +102,9 @@ impl Strategy {
 
     fn calculate_base_score(&self) -> i32 {
         let player_base_score = match self.player_movement {
-            Movement::A => { 1 }
-            Movement::B => { 2 }
-            Movement::C => { 3 }
+            Movement::Rock => { 1 }
+            Movement::Paper => { 2 }
+            Movement::Scissor => { 3 }
         };
 
         return player_base_score;

@@ -48,6 +48,6 @@ pub fn resolve() {
     //Finding the three with more calories
     elves.sort_by(|a, b| b.get_calories().cmp(&a.get_calories()));
 
-    println!("{}", max_calories);
-    println!("{}", elves[0].get_calories() + elves[1].get_calories() + elves[2].get_calories());
+    println!("Puzzle 1 Part 1: {}", max_calories);
+    println!("Puzzle 1 Part 2: {}", elves[0].get_calories() + elves[1].get_calories() + elves[2].get_calories());
 }
