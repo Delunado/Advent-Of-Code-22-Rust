@@ -22,7 +22,7 @@ pub fn resolve() {
     let path_file = "input/puzzle1.txt";
 
     let file_content = fs::read_to_string(path_file)
-        .expect("Something went wrong reading the file");
+        .expect("Something went wrong reading the file ");
 
 
     let mut elves = Vec::new();
